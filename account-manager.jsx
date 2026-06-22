@@ -42,6 +42,36 @@ async function sha256Hex(text) {
     .join("");
 }
 
+// ブラウザのlocalStorageを使った簡易ストレージ。
+// このブラウザだけに保存され、他の人とは共有されない。
+const localDB = {
+  async get(key) {
+    try {
+      const value = localStorage.getItem(key);
+      if (value === null) return null;
+      return { key, value };
+    } catch (e) {
+      return null;
+    }
+  },
+  async set(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return { key, value };
+    } catch (e) {
+      return null;
+    }
+  },
+  async delete(key) {
+    try {
+      localStorage.removeItem(key);
+      return { key, deleted: true };
+    } catch (e) {
+      return null;
+    }
+  },
+};
+
 const emptyDraft = () => ({
   username: "",
   rank: "未確認",
@@ -82,7 +112,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await window.storage.get(SESSION_KEY, false);
+        const res = await localDB.get(SESSION_KEY);
         if (res && res.value === "1") {
           setLoggedIn(true);
         }
@@ -98,7 +128,7 @@ export default function App() {
   const loadAccounts = useCallback(async () => {
     setLoadingData(true);
     try {
-      const res = await window.storage.get(STORAGE_KEY, true);
+      const res = await localDB.get(STORAGE_KEY);
       if (res && res.value) {
         setAccounts(JSON.parse(res.value));
       } else {
@@ -123,7 +153,7 @@ export default function App() {
   const persist = async (next) => {
     setSaving(true);
     try {
-      const result = await window.storage.set(STORAGE_KEY, JSON.stringify(next), true);
+      const result = await localDB.set(STORAGE_KEY, JSON.stringify(next));
       if (!result) throw new Error("保存に失敗しました");
       setAccounts(next);
     } catch (e) {
@@ -142,7 +172,7 @@ export default function App() {
         setLoginError("");
         setLoggedIn(true);
         try {
-          await window.storage.set(SESSION_KEY, "1", false);
+          await localDB.set(SESSION_KEY, "1");
         } catch (e) {}
       } else {
         setLoginError("パスコードが正しくありません");
@@ -156,7 +186,7 @@ export default function App() {
     setLoggedIn(false);
     setPassInput("");
     try {
-      await window.storage.delete(SESSION_KEY, false);
+      await localDB.delete(SESSION_KEY);
     } catch (e) {}
   };
 

@@ -1,12 +1,43 @@
-<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NFA</title>
-  </head>
-  <body style="margin:0;">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+# NFA
+
+このフォルダには、Webサイトとして公開できる状態の完成したアプリが入っています。
+以下の手順通りに進めれば、無料でインターネット上に公開できます。
+
+ログイン用パスコード: `nfamisudori`
+（コードの中にはこのパスコードの「ハッシュ値」だけが書かれていて、パスコードそのものは書かれていません）
+
+---
+
+## 手順1：GitHubアカウントを作る
+
+1. https://github.com/ にアクセスする
+2. 「Sign up」からメールアドレスとパスワードを入力してアカウントを作成する
+3. 確認メールが届いたら認証を完了する
+
+## 手順2：このフォルダをGitHubにアップロードする
+
+1. GitHubにログインした状態で、右上の「+」→「New repository」を選ぶ
+2. Repository name に好きな名前を入れる（例：`nfa-account-manager`）
+3. Public（公開）のままでよい。「Create repository」を押す
+4. 作成後の画面に出てくる「uploading an existing file」というリンクをクリックする
+5. このフォルダの中身（`package.json`、`index.html`、`src`フォルダなど、`node_modules`以外の全部）をドラッグ&ドロップでアップロードする
+6. 一番下の「Commit changes」を押す
+
+## 手順3：Vercelで公開する
+
+1. https://vercel.com/ にアクセスする
+2. 「Sign Up」→「Continue with GitHub」を選び、GitHubアカウントでログインする
+3. ログイン後、「Add New...」→「Project」を選ぶ
+4. さきほどアップロードしたリポジトリ（`nfa-account-manager`）を選び、「Import」を押す
+5. 設定はそのまま変更せず（Vite が自動で検出されます）、「Deploy」ボタンを押す
+6. 1〜2分待つと、`https://xxxxx.vercel.app` のようなURLが発行され、これが公開URLになる
+
+これで、誰でもそのURLにアクセスし、パスコード `nfamisudori` を入力すれば管理画面に入れるようになります。
+
+---
+
+## 注意点（必ず読んでください）
+
+- データ（アカウント一覧）は、操作した人のブラウザの中だけに保存されます。別のパソコンやスマホ、別のブラウザでアクセスすると、データは空の状態になります。全員で同じデータを共有したい場合は、別途データベース（例：Supabaseなど）を追加する必要があります。お声がけください。
+- パスコードはハッシュ化されていますが、サイト自体に強固なログイン制限（ブルートフォース対策など）はありません。身内や少人数のグループで使う前提の簡易的な認証です。
+- パスコードを変更したい場合は、`src/App.jsx` の中の `ADMIN_PASSCODE_HASH` を、新しいパスコードのSHA-256ハッシュ値に書き換える必要があります。やり方が分からない場合は、新しいパスコードを伝えていただければこちらで作り直します。
